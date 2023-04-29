@@ -3,24 +3,8 @@ Spring Webflux
 
 #### Install Mongo DB in MAC
 
-- Run the below command to install the **MongoDB**.
+- Run the below command to bring up **MongoDB** using docker-compose.
 
 ```
-brew services stop mongodb
-brew uninstall mongodb
-
-brew tap mongodb/brew
-brew install mongodb-community
+docker-compose up
 ```
-
--  How to restart MongoDB in your local machine.
-
-```
-brew services restart mongodb-community
-```
-
-#### Install Mongo DB in Windows
-
-- Follow the steps in the below link to install Mongo db in Windows.
-
-https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
