@@ -8,18 +8,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-@SpringBootTest (webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
-class MoviesInfoControllerTest {
+class MoviesInfoControllerIntegrationTest {
 
     @Autowired
     MovieInfoRepository movieInfoRepository;
@@ -27,7 +27,7 @@ class MoviesInfoControllerTest {
     @Autowired
     WebTestClient webTestClient;
 
-    String BASE_URL="/v1/movieinfos";
+    String BASE_URL = "/v1/movieinfos";
 
     @BeforeEach
     void setUp() {
@@ -51,7 +51,7 @@ class MoviesInfoControllerTest {
     @Test
     void addMovieInfo() {
 
-        var movieInfo=new MovieInfo(null, "Batman Begins1",
+        var movieInfo = new MovieInfo(null, "Batman Begins1",
                 2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
 
         webTestClient.post()
@@ -60,18 +60,17 @@ class MoviesInfoControllerTest {
                 .expectStatus().isCreated()
                 .expectBody(MovieInfo.class)
                 .consumeWith(movieInfoEntityExchangeResult -> {
-                   var movieInfoReturn= movieInfoEntityExchangeResult.getResponseBody();
-                   assert movieInfoReturn !=null;
-                   assert movieInfoReturn.getMovieInfoId() !=null;
+                    var movieInfoReturn = movieInfoEntityExchangeResult.getResponseBody();
+                    assert movieInfoReturn != null;
+                    assert movieInfoReturn.getMovieInfoId() != null;
                 });
     }
-
 
 
     @Test
     void addMovieInfoWithId() {
 
-        var movieInfo=new MovieInfo(null, "Batman Begins2",
+        var movieInfo = new MovieInfo(null, "Batman Begins2",
                 2005, List.of("Christian Bale-1", "Michael Cane-1"), LocalDate.parse("2005-06-15"));
 
         webTestClient.post()
@@ -80,21 +79,21 @@ class MoviesInfoControllerTest {
                 .expectStatus().isCreated()
                 .expectBody(MovieInfo.class)
                 .consumeWith(movieInfoEntityExchangeResult -> {
-                    var movieInfoReturn= movieInfoEntityExchangeResult.getResponseBody();
-                    assert movieInfoReturn !=null;
-                    assert movieInfoReturn.getMovieInfoId() !=null;
+                    var movieInfoReturn = movieInfoEntityExchangeResult.getResponseBody();
+                    assert movieInfoReturn != null;
+                    assert movieInfoReturn.getMovieInfoId() != null;
 
                     webTestClient.get()
-                            .uri(BASE_URL+"/{id}",movieInfoReturn.getMovieInfoId())
+                            .uri(BASE_URL + "/{id}", movieInfoReturn.getMovieInfoId())
                             .exchange()
                             .expectStatus()
                             .is2xxSuccessful()
                             .expectBody(MovieInfo.class)
                             .consumeWith(movieInfoEntityExchangeResult1 ->
                             {
-                                var movieInfoReturnVal= movieInfoEntityExchangeResult.getResponseBody();
-                                assert movieInfoReturnVal !=null;
-                                assert movieInfoReturnVal.getMovieInfoId() !=null;
+                                var movieInfoReturnVal = movieInfoEntityExchangeResult.getResponseBody();
+                                assert movieInfoReturnVal != null;
+                                assert movieInfoReturnVal.getMovieInfoId() != null;
                             });
                 });
 
@@ -117,7 +116,7 @@ class MoviesInfoControllerTest {
         var movieInfoId = "abc";
 
         webTestClient.get()
-                .uri(BASE_URL+"/{id}",movieInfoId)
+                .uri(BASE_URL + "/{id}", movieInfoId)
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
@@ -127,21 +126,21 @@ class MoviesInfoControllerTest {
                     assert movieInfoReturn != null;
                 });
 
-        }
+    }
 
     @Test
     void deleteMovieById() {
         var movieInfoId = "abc";
 
         webTestClient.delete()
-                .uri(BASE_URL+"/{id}",movieInfoId)
+                .uri(BASE_URL + "/{id}", movieInfoId)
                 .exchange()
                 .expectStatus()
                 .isNoContent();
 
 
         webTestClient.get()
-                .uri(BASE_URL+"/{id}",movieInfoId)
+                .uri(BASE_URL + "/{id}", movieInfoId)
                 .exchange()
                 .expectStatus()
                 .isNotFound();
@@ -153,32 +152,33 @@ class MoviesInfoControllerTest {
 
         var movieInfoId = "abc";
 
-        var updatedMovieInfo=new MovieInfo(null, "Batman Begins1",
+        var updatedMovieInfo = new MovieInfo(null, "Batman Begins1",
                 2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
 
         webTestClient.put()
-                .uri(BASE_URL+"/{id}",movieInfoId)
+                .uri(BASE_URL + "/{id}", movieInfoId)
                 .bodyValue(updatedMovieInfo).exchange()
                 .expectStatus().isCreated()
                 .expectBody(MovieInfo.class)
                 .consumeWith(movieInfoEntityExchangeResult -> {
-                    var movieInfoReturn= movieInfoEntityExchangeResult.getResponseBody();
-                    assert movieInfoReturn !=null;
-                    assert movieInfoReturn.getMovieInfoId() !=null;
+                    var movieInfoReturn = movieInfoEntityExchangeResult.getResponseBody();
+                    assert movieInfoReturn != null;
+                    assert movieInfoReturn.getMovieInfoId() != null;
 
-                    assertEquals(movieInfoReturn.getName(),updatedMovieInfo.getName());
-                    assertEquals(movieInfoReturn.getCast(),updatedMovieInfo.getCast());
-                    assertEquals(movieInfoReturn.getYear(),updatedMovieInfo.getYear());
-                    assertEquals(movieInfoReturn.getRelease_date(),updatedMovieInfo.getRelease_date());                });
+                    assertEquals(movieInfoReturn.getName(), updatedMovieInfo.getName());
+                    assertEquals(movieInfoReturn.getCast(), updatedMovieInfo.getCast());
+                    assertEquals(movieInfoReturn.getYear(), updatedMovieInfo.getYear());
+                    assertEquals(movieInfoReturn.getRelease_date(), updatedMovieInfo.getRelease_date());
+                });
 
 
         webTestClient.get()
-                .uri(BASE_URL+"/{id}",movieInfoId).exchange()
+                .uri(BASE_URL + "/{id}", movieInfoId).exchange()
                 .expectStatus().isOk()
                 .expectBody(MovieInfo.class)
                 .consumeWith(movieInfoEntityExchangeResult -> {
-                    var movieInfoReturn= movieInfoEntityExchangeResult.getResponseBody();
-                    assert movieInfoReturn !=null;
+                    var movieInfoReturn = movieInfoEntityExchangeResult.getResponseBody();
+                    assert movieInfoReturn != null;
                     assert movieInfoReturn.getMovieInfoId().equals(movieInfoId);
                     assert movieInfoReturn.getName().equalsIgnoreCase(updatedMovieInfo.getName());
                     assert movieInfoReturn.getCast().equals(updatedMovieInfo.getCast());
