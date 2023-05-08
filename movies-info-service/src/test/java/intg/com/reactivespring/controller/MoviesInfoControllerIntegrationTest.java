@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -111,6 +112,21 @@ class MoviesInfoControllerIntegrationTest {
                 .hasSize(3);
     }
 
+
+    @Test
+    void getAllMovieByYear() {
+        var uri = UriComponentsBuilder.fromUriString(BASE_URL).queryParam("year", "2005")
+                .buildAndExpand().toUri();
+
+        webTestClient.get()
+                .uri(uri)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(MovieInfo.class)
+                .hasSize(1);
+    }
+
     @Test
     void getMovieById() {
         var movieInfoId = "abc";
@@ -158,7 +174,7 @@ class MoviesInfoControllerIntegrationTest {
         webTestClient.put()
                 .uri(BASE_URL + "/{id}", movieInfoId)
                 .bodyValue(updatedMovieInfo).exchange()
-                .expectStatus().isCreated()
+                .expectStatus().is2xxSuccessful()
                 .expectBody(MovieInfo.class)
                 .consumeWith(movieInfoEntityExchangeResult -> {
                     var movieInfoReturn = movieInfoEntityExchangeResult.getResponseBody();
@@ -186,5 +202,22 @@ class MoviesInfoControllerIntegrationTest {
                     assert movieInfoReturn.getRelease_date().equals(updatedMovieInfo.getRelease_date());
 
                 });
+    }
+
+
+    @Test
+    void updatedMovieInfo_Not_Present() {
+
+        var movieInfoId = "def";
+
+        var updatedMovieInfo = new MovieInfo(null, "Batman Begins1",
+                2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        webTestClient.put()
+                .uri(BASE_URL + "/{id}", movieInfoId)
+                .bodyValue(updatedMovieInfo).exchange()
+                .expectStatus().isNotFound();
+
+
     }
 }

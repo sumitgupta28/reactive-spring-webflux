@@ -54,11 +54,26 @@ class MovieInfoRepositoryIntgTest {
     void findById() {
         var movieInfoMono = movieInfoRepository.findById("abc").log();
         StepVerifier.create(movieInfoMono)
-                .assertNext(movieInfo -> {
-                    assertEquals("Dark Knight Rises", movieInfo.getName());
-                }).verifyComplete();
+                .assertNext(movieInfo -> assertEquals("Dark Knight Rises", movieInfo.getName())).verifyComplete();
     }
 
+
+    @Test
+    void findByYear() {
+        var movieInfoMono = movieInfoRepository.findByYear(2005).log();
+        StepVerifier.create(movieInfoMono)
+                .assertNext(movieInfo -> assertEquals("Batman Begins", movieInfo.getName())).verifyComplete();
+    }
+
+
+    @Test
+    void findByName() {
+        var movieInfoMono = movieInfoRepository.findByName("Batman Begins").log();
+        StepVerifier.create(movieInfoMono)
+                .assertNext(movieInfo -> {
+                    assertEquals("Batman Begins", movieInfo.getName());
+                }).verifyComplete();
+    }
 
     @Test
     void updateMovieInfo() {
